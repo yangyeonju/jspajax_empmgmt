@@ -10,9 +10,21 @@ import javax.sql.DataSource;
 
 public class DBConnection {
 	
-	//기본 생성자가 생략
+	private static DBConnection instance = null;
+	
+	//싱글톤 패턴에서는 외부에서 기본생성자에 접근하지 못하도록 만들어야 한다.
+	//기본생성자를 안만들면 기본으로 만들어지는데 public하게 만들어지므로, private한 생성자가 필요하다면 이렇게 직접 만들어주어야한다.
+	private DBConnection() { }
+
+	public static DBConnection getInstance() {
+		if(instance == null) {
+			instance = new DBConnection();
+		}
+		return instance;
+	}
 	
 	//실제 오라클 데이터베이스에 접속하는 기능의 메서드
+	//throws : 현재 메서드를 호출한 곳에서 예외 처리 하도록 미뤄둔 것
 	public Connection dbOpen() throws NamingException, SQLException {
 		//InitialContext 초기 컨텍스트를 구성합니다. 환경 프로퍼티는 제공되지 않습니다. 새로운 InitialContext(null)와 동일합니다.
 		Context initContext = new InitialContext(); //context.xml 파일의 객체
