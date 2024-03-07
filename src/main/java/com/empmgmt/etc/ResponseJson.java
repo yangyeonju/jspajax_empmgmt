@@ -37,6 +37,7 @@ public class ResponseJson {
 			employee.put("commission_pct", e.getCommissionPct() + "");
 			employee.put("manager_id", e.getManagerId() + "");
 			employee.put("department_id", e.getDepartmentId() + "");
+			employee.put("department_name", e.getDepartmentName());
 			
 			//이 데이터들을 까먹기전에 배열에 넣어주어야 함.
 			
