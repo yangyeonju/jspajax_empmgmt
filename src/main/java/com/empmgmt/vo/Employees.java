@@ -16,9 +16,10 @@ public class Employees {
 	private float commissionPct;
 	private int managerId;
 	private int departmentId;
+	private String departmentName;
 	
 	public Employees(int employeeId, String firstName, String lastName, String email, String phoneNumber, Date hireDate,
-			String jobId, float salary, float commissionPct, int managerId, int departmentId) {
+			String jobId, float salary, float commissionPct, int managerId, int departmentId, String departmentName) {
 		super();
 		this.employeeId = employeeId;
 		this.firstName = firstName;
@@ -31,6 +32,7 @@ public class Employees {
 		this.commissionPct = commissionPct;
 		this.managerId = managerId;
 		this.departmentId = departmentId;
+		this.departmentName = departmentName;
 	}
 
 	public int getEmployeeId() {
@@ -121,13 +123,20 @@ public class Employees {
 		this.departmentId = departmentId;
 	}
 
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
 	@Override
 	public String toString() {
 		return "Employees [employeeId=" + employeeId + ", firstName=" + firstName + ", lastName=" + lastName
 				+ ", email=" + email + ", phoneNumber=" + phoneNumber + ", hireDate=" + hireDate + ", jobId=" + jobId
 				+ ", salary=" + salary + ", commissionPct=" + commissionPct + ", managerId=" + managerId
-				+ ", departmentId=" + departmentId + "]";
+				+ ", departmentId=" + departmentId + ", departmentName=" + departmentName + "]";
 	}
-	
 	
 }
