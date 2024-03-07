@@ -16,7 +16,7 @@ import com.empmgmt.etc.ResponseJson;
 import com.empmgmt.vo.Employees;
 
 
-@WebServlet("/getEmployeesByName.do")
+@WebServlet("/getEmployeeByName.do")
 public class GetEmployeesByName extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

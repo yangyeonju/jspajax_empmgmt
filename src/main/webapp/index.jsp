@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -7,132 +7,169 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link
-   href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-   rel="stylesheet">
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet">
 <script
-   src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script
-   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <title>Insert title here</title>
 <script>
 	let empData = null; //전체 사원 목록
 
+	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
+		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
+		getEntireEmployeesData();
 
-   $(function (){  // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
-      // 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
-      getEntireEmployeesData();      
-      
-      
-   });
-   
-   function getEntireEmployeesData() {
-      // 서블릿에게 전체 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
-        $.ajax({
-          url: './getEntireEmployees.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
-          type: 'get', // 통신방식(GET, POST, PUT, DELETE)
-          dataType: 'json', // 수신받을 데이터의 타입
-          success: function (data) {  // data(json)
-            // 통신 성공하면 실행할 내용들....
-            console.log(data);
-          	//전역변수에 data 넣기
-             empData = data;
-             outputEntireEmployees(data);
+		//keyup이 되면 evt가 실행된다.
+		
+		$(".searchName").keyup(function(evt) {
+			//.searchName (input)의 value값을 변수에 넣어줌.
+			let searchName = $(this).val();
+			
+			//1글자만 입력했을때 실행되는게 아니라 3글자입력했을때부터 찾도록 할 예정.
+			//검색할 사원의 이름을입력받는곳에 문자열이 입력되고 그 문자열의 길이가 3이상이면
+			if(searchName.length >= 3){
+				getEmployeesByName(searchName);
+			}
+		});
+	
+	});
+	
+	
+	function getEmployeesByName(searchName){
+		// 서블릿에게 이름에 searchName이 포함된 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
+		$.ajax({
+			url : './getEmployeeByName.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
+			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
+			dataType : 'json', // 수신받을 데이터의 타입
+			//서블릿으로 전송하는 데이터
+			data : {
+				"searchName" : searchName
+			},
+			success : function(data) { // data(json)
+				// 통신 성공하면 실행할 내용들....
+				console.log(data);
+			}
+		});
+	}
+	
 
-          }
-        });
-   }
-   
-   function outputEntireEmployees() {
-      let output = '';
-      output += "<table class='table table-hover'><thead>";
-      output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
-      output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th></tr></thead>";
-      output += "<tbody>";
-      
-      // 사원수만큼 반복하여 출력
-      //data는 json 그자체이고 data.employees 해야 배열이 나옴
-      $.each(empData.employees, function(i, e) {
-    	 //i는 몇번째, $(e)는 사원 정보
-         console.log($(e));
-         output += "<tr>";
-         
-         //백틱 쓸 때 달라 중괄호는 jsp에서 el표현식이랑 겹치기떄문에 escape \ 써주어야함
-		 //데이터를 java에서 보내면 jsp에서 알아서 el로 알아들음.
-		 //하지만 지금은 ajax. json으로 만들어 js로 보내왔기 때문에 이 데이터는 더이상 java 객체가 아니다.
-		 //그러므로 이 경우 js! el과 jstl표현식을 쓰지 못한다. 
-         
-         output += `<td>\${i + 1}</td>`;
-         output += `<td>\${e.employee_id}`;
-         output += `<td>\${e.first_name}, \${e.last_name}</td>`;
-         output += `<td>\${e.email}</td>`;
-         output += `<td>\${e.phone_number}</td>`;
-         output += `<td>\${e.hire_date}</td>`;
-         output += `<td>\${e.job_id}</td>`;
-         //sal이 숫자같지만.. 제이슨으로 가져왔으면 문자열이니까. 여기선 출력할게 아니니까. 중괄호 쓰면 안된다.
-         //급여가 금액이므로 단위($) 붙이고 3자리마다 콤마를 찍어 표현
-         let sal = Number(e.salary).toLocaleString();
-         output += `<td>$\${sal}</td>`;
-         
-         //커미션은 %단위이므로 *100을 하고 단위를 붙여 표현
-         let comm = Number(e.commission_pct) * 100;
-         if(comm != 0){
-	         output += `<td>\${comm}%</td>`;        	 
-         }else{
-        	 output += `<td>-</td>`;
-         }
-         
-         //직속상사의 사번이 아닌 이름을 출력하자
-         let managerId = e.manager_id;
-         let managerName = findManagerName(managerId);
-         output += `<td>\${managerName}</td>`;
-         
-         
-         //output += `<td>\${e.department_id}</td>`;
-         output += `<td>\${e.department_name}</td>`;
-         output += "</tr>";
-      });
-      
-       output += "</tbody></table>";
-       
-       $(".outputData").html(output);
-   }
-   
-   function findManagerName(managerId){
-	   //managerId: 이름을 찾을 직속상사의 사번
-	   //전체사원목록이 있는 배열을 반복하면서 사번이 managerId인 사원의 이름을 찾아 반환한다.
-	   //얘는 break를 못한다.
-	   let managerName = "";
-   
-	   $.each(empData.employees, function(i, e) {
-	   		//console.log($(e));
-	   		//직속상사의사번이 사번과 같은 아이를 사원 인원수만큼 반복하며 하나하나 비교하면서 찾는다.
-	   		
-	   		
-	   		if(e.employee_id == managerId){
-	   			managerName = e.first_name + ", " + e.last_name;
-	   		}
-	   		
-	   })
-	   return managerName; //사번이 managerId인 사원의 이름(사수이름)
-	   
-	   
-   }
-   
-   
+	function getEntireEmployeesData() {
+		// 서블릿에게 전체 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
+		$.ajax({
+			url : './getEntireEmployees.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
+			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
+			dataType : 'json', // 수신받을 데이터의 타입
+			success : function(data) { // data(json)
+				// 통신 성공하면 실행할 내용들....
+				console.log(data);
+				//전역변수에 data 넣기
+				empData = data;
+				outputEntireEmployees(data);
+
+			}
+		});
+	}
+
+	
+	function outputEntireEmployees() {
+		let output = '';
+		output += "<table class='table table-hover'><thead>";
+		output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
+		output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th></tr></thead>";
+		output += "<tbody>";
+
+		// 사원수만큼 반복하여 출력
+		//data는 json 그자체이고 data.employees 해야 배열이 나옴
+		$.each(empData.employees, function(i, e) {
+			//i는 몇번째, $(e)는 사원 정보
+			console.log($(e));
+			output += "<tr>";
+
+			//백틱 쓸 때 달라 중괄호는 jsp에서 el표현식이랑 겹치기떄문에 escape \ 써주어야함
+			//데이터를 java에서 보내면 jsp에서 알아서 el로 알아들음.
+			//하지만 지금은 ajax. json으로 만들어 js로 보내왔기 때문에 이 데이터는 더이상 java 객체가 아니다.
+			//그러므로 이 경우 js! el과 jstl표현식을 쓰지 못한다. 
+
+			output += `<td>\${i + 1}</td>`;
+			output += `<td>\${e.employee_id}`;
+			output += `<td>\${e.first_name}, \${e.last_name}</td>`;
+			output += `<td>\${e.email}</td>`;
+			output += `<td>\${e.phone_number}</td>`;
+			output += `<td>\${e.hire_date}</td>`;
+			output += `<td>\${e.job_id}</td>`;
+			//sal이 숫자같지만.. 제이슨으로 가져왔으면 문자열이니까. 여기선 출력할게 아니니까. 중괄호 쓰면 안된다.
+			//급여가 금액이므로 단위($) 붙이고 3자리마다 콤마를 찍어 표현
+			let sal = Number(e.salary).toLocaleString();
+			output += `<td>$\${sal}</td>`;
+
+			//커미션은 %단위이므로 *100을 하고 단위를 붙여 표현
+			let comm = Number(e.commission_pct) * 100;
+			if (comm != 0) {
+				output += `<td>\${comm}%</td>`;
+			} else {
+				output += `<td>-</td>`;
+			}
+
+			//직속상사의 사번이 아닌 이름을 출력하자
+			let managerId = e.manager_id;
+			let managerName = findManagerName(managerId);
+			output += `<td>\${managerName}</td>`;
+
+			//output += `<td>\${e.department_id}</td>`;
+			output += `<td>\${e.department_name}</td>`;
+			output += "</tr>";
+		});
+
+		output += "</tbody></table>";
+
+		$(".outputData").html(output);
+	}
+
+	function findManagerName(managerId) {
+		//managerId: 이름을 찾을 직속상사의 사번
+		//전체사원목록이 있는 배열을 반복하면서 사번이 managerId인 사원의 이름을 찾아 반환한다.
+		//얘는 break를 못한다.
+		let managerName = "";
+
+		$.each(empData.employees, function(i, e) {
+			//console.log($(e));
+			//직속상사의사번이 사번과 같은 아이를 사원 인원수만큼 반복하며 하나하나 비교하면서 찾는다.
+
+			if (e.employee_id == managerId) {
+				managerName = e.first_name + ", " + e.last_name;
+			}
+
+		})
+		return managerName; //사번이 managerId인 사원의 이름(사수이름)
+
+	}
 </script>
 <style>
-	.outputData{
-		margin-top:20px;
-		
-	}
+.outputData, .searchName {
+	margin-top: 20px;
+}
+
+.searchName input {text-align:center; font-size:15px; }
 </style>
 </head>
 <body>
-   <div class="container-fluid p-5 bg-primary text-white text-center">
-      <h1>Employee Management</h1>
-      <p>ver 1.0</p>
-   </div>
+	<div class="container-fluid p-5 bg-primary text-white text-center">
+		<h1>Employee Management</h1>
+		<p>ver 1.0</p>
+	</div>
 
-   <div class="container outputData"></div>
+	<div class="container">
+		<!-- ajax는 form태그를 쓰지 않는다! -->
+		<div class="row">
+			<div class="col">
+				<input type="text" class="form-control searchName" placeholder="찾을 사원의 이름을 입력하세요."
+					name="findEmpName">
+			</div>
+		</div>
+	</div>
+
+	<div class="container outputData"></div>
 </body>
 </html>
