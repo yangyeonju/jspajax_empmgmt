@@ -48,9 +48,17 @@
       output += "<tbody>";
       
       // 사원수만큼 반복하여 출력
+      //data는 json 그자체이고 data.employees 해야 배열이 나옴
       $.each(data.employees, function(i, e) {
+    	 //i는 몇번째, $(e)는 사원 정보
          console.log($(e));
          output += "<tr>";
+         
+         //백틱 쓸 때 달라 중괄호는 jsp에서 el표현식이랑 겹치기떄문에 escape \ 써주어야함
+		 //데이터를 java에서 보내면 jsp에서 알아서 el로 알아들음.
+		 //하지만 지금은 ajax. json으로 만들어 js로 보내왔기 때문에 이 데이터는 더이상 java 객체가 아니다.
+		 //그러므로 이 경우 js! el과 jstl표현식을 쓰지 못한다. 
+         
          output += `<td>\${i + 1}</td>`;
          output += `<td>\${e.employee_id}`;
          output += `<td>\${e.first_name}, \${e.last_name}</td>`;
@@ -71,10 +79,9 @@
         	 output += `<td>-</td>`;
          }
          
-         
-         
          output += `<td>\${e.manager_id}</td>`;
-         output += `<td>\${e.department_id}</td>`;
+         //output += `<td>\${e.department_id}</td>`;
+         output += `<td>\${e.department_name}</td>`;
          output += "</tr>";
       });
       
