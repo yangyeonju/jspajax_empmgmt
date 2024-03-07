@@ -41,7 +41,9 @@ public class SelectEmployees {
 		Connection con = db.dbOpen(); //-스트림객체
 		
 		//2.쿼리문 준비
-		String query = "select * from employees";
+		String query = "select e.*, d.department_name "
+				+ "from employees e, departments "
+				+ "where e.department_id = d.department_id";
 		
 		//3.PrepareStatement 객체 : 연결된 db에 쿼리문 전송하고 실행하고 결과를 얻어옴 -스트림객체
 		PreparedStatement pstmt = con.prepareStatement(query);
@@ -63,7 +65,10 @@ public class SelectEmployees {
 					rs.getFloat("SALARY"),
 					rs.getFloat("COMMISSION_PCT"),
 					rs.getInt("MANAGER_ID"),
-					rs.getInt("DEPARTMENT_ID")));
+					rs.getInt("DEPARTMENT_ID"),
+					rs.getString("DEPARTMENT_NAME")
+					)
+			);
 		}
 		
 		//여기까지 잘 나오는지 확인
