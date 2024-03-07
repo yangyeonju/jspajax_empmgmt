@@ -65,7 +65,14 @@
          
          //커미션은 %단위이므로 *100을 하고 단위를 붙여 표현
          let comm = Number(e.commission_pct) * 100;
-         output += `<td>\${comm}%</td>`;
+         if(comm != 0){
+	         output += `<td>\${comm}%</td>`;        	 
+         }else{
+        	 output += `<td>-</td>`;
+         }
+         
+         
+         
          output += `<td>\${e.manager_id}</td>`;
          output += `<td>\${e.department_id}</td>`;
          output += "</tr>";
