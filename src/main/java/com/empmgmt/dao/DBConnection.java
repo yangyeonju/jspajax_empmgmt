@@ -1,6 +1,8 @@
 package com.empmgmt.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.naming.Context;
@@ -40,4 +42,11 @@ public class DBConnection {
 		
 		return conn;
 	}
+	
+	public void dbClose(ResultSet rs, PreparedStatement pstmt, Connection con) throws SQLException {
+		rs.close();
+		pstmt.close();
+		con.close();
+	}
+	
 }
