@@ -42,8 +42,8 @@ public class SelectEmployees {
 		
 		//2.쿼리문 준비
 		String query = "select e.*, d.department_name "
-				+ "from employees e, departments "
-				+ "where e.department_id = d.department_id";
+				+ "from employees e, departments d "
+				+ "where e.department_id = d.department_id order by employee_id";
 		
 		//3.PrepareStatement 객체 : 연결된 db에 쿼리문 전송하고 실행하고 결과를 얻어옴 -스트림객체
 		PreparedStatement pstmt = con.prepareStatement(query);

@@ -15,6 +15,7 @@
    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <title>Insert title here</title>
 <script>
+	let empData = null; //전체 사원 목록
 
 
    $(function (){  // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
@@ -33,14 +34,15 @@
           success: function (data) {  // data(json)
             // 통신 성공하면 실행할 내용들....
             console.log(data);
-             
+          	//전역변수에 data 넣기
+             empData = data;
              outputEntireEmployees(data);
 
           }
         });
    }
    
-   function outputEntireEmployees(data) {
+   function outputEntireEmployees() {
       let output = '';
       output += "<table class='table table-hover'><thead>";
       output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
@@ -49,7 +51,7 @@
       
       // 사원수만큼 반복하여 출력
       //data는 json 그자체이고 data.employees 해야 배열이 나옴
-      $.each(data.employees, function(i, e) {
+      $.each(empData.employees, function(i, e) {
     	 //i는 몇번째, $(e)는 사원 정보
          console.log($(e));
          output += "<tr>";
@@ -79,7 +81,12 @@
         	 output += `<td>-</td>`;
          }
          
-         output += `<td>\${e.manager_id}</td>`;
+         //직속상사의 사번이 아닌 이름을 출력하자
+         let managerId = e.manager_id;
+         let managerName = findManagerName(managerId);
+         output += `<td>\${managerName}</td>`;
+         
+         
          //output += `<td>\${e.department_id}</td>`;
          output += `<td>\${e.department_name}</td>`;
          output += "</tr>";
@@ -90,8 +97,35 @@
        $(".outputData").html(output);
    }
    
+   function findManagerName(managerId){
+	   //managerId: 이름을 찾을 직속상사의 사번
+	   //전체사원목록이 있는 배열을 반복하면서 사번이 managerId인 사원의 이름을 찾아 반환한다.
+	   //얘는 break를 못한다.
+	   let managerName = "";
+   
+	   $.each(empData.employees, function(i, e) {
+	   		//console.log($(e));
+	   		//직속상사의사번이 사번과 같은 아이를 사원 인원수만큼 반복하며 하나하나 비교하면서 찾는다.
+	   		
+	   		
+	   		if(e.employee_id == managerId){
+	   			managerName = e.first_name + ", " + e.last_name;
+	   		}
+	   		
+	   })
+	   return managerName; //사번이 managerId인 사원의 이름(사수이름)
+	   
+	   
+   }
+   
    
 </script>
+<style>
+	.outputData{
+		margin-top:20px;
+		
+	}
+</style>
 </head>
 <body>
    <div class="container-fluid p-5 bg-primary text-white text-center">
@@ -99,6 +133,6 @@
       <p>ver 1.0</p>
    </div>
 
-   <div class="outputData"></div>
+   <div class="container outputData"></div>
 </body>
 </html>
