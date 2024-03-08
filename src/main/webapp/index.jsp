@@ -37,7 +37,7 @@
 				outputEntireEmployees();
 			}
 		});
-		
+
 		//라디오 버튼을 클릭하면 다음의 함수 실행
 		$(".orderMethod").click(function() {
 			//정렬 라디오 버튼을 클릭하면 클릭한 라디오 버튼의 value값을 얻어옴
@@ -46,7 +46,12 @@
 			let orderMethod = $(this).val();
 			//정렬만 바뀌는거지 전체데이터를 얻어오는 것은 똑같다. 정렬의 값을 보내면서 전체데이터 출력함수 호출
 			getEntireEmployeesData(orderMethod);
-			
+
+		})
+		
+		//saveEmpModalClose 버튼을 클릭하면 신규사원저장 모달을 닫아야 한다
+		$('.saveEmpModalClose').click(function() {
+			$('#saveEmpModal').hide();
 		})
 
 	});
@@ -72,13 +77,13 @@
 
 	function getEntireEmployeesData(orderMethod) {
 		//orderMethod가 있을수도 없을수도 있다
-		if(orderMethod == null){
+		if (orderMethod == null) {
 			//정렬기능 라디오 버튼을 클릭하지 않았다면 (제일 처음 수행될 때) 사번으로 정렬되도록 한다
 			orderMethod = 'empNo';
 		}
-		
+
 		console.log(orderMethod);
-		
+
 		// 서블릿에게 전체 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
 		$.ajax({
 			url : './getEntireEmployees.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
@@ -185,6 +190,10 @@
 		return managerName; //사번이 managerId인 사원의 이름(사수이름)
 
 	}
+
+	function saveModalOpen() {
+		$("#saveEmpModal").show(200);
+	}
 </script>
 <style>
 .outputData, .searchName {
@@ -200,8 +209,16 @@
 	margin-top: 20px;
 	display: flex;
 	flex-direction: row;
-	justify-content: space-around;	
+	justify-content: space-around;
 }
+
+.saveIcon {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	cursor: pointer;
+}
+
 </style>
 </head>
 <body>
@@ -230,12 +247,44 @@
 					class="form-check-label" for="radio2"></label>
 			</div>
 			<div class="form-check">
-				<input type="radio" class="form-check-input orderMethod" name="orderMethod"
-					value="salary">급여(내림차순) <label class="form-check-label"></label>
+				<input type="radio" class="form-check-input orderMethod"
+					name="orderMethod" value="salary">급여(내림차순) <label
+					class="form-check-label"></label>
 			</div>
 		</div>
 	</div>
 
 	<div class="container outputData"></div>
+
+	<!-- 신규 사원을 저장하는 버튼 -->
+	<div class="saveIcon">
+		<img width="50" height="50"
+			src="https://img.icons8.com/ios-filled/50/add--v1.png" alt="add--v1"
+			onclick="saveModalOpen();" />
+	</div>
+
+	<!-- 신규 사원을 저장하는 모달창 -->
+	<div class="modal" id="saveEmpModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title">신규 사원 등록</h4>
+					<button type="button" class="btn-close saveEmpModalClose" data-bs-dismiss="modal"></button>
+				</div>
+
+				<!-- Modal body -->
+				<div class="modal-body">등록할 사원 정보 입력하세요</div>
+
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger saveEmpModalClose"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
 </body>
 </html>
