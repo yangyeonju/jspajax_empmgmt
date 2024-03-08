@@ -1,6 +1,7 @@
 package com.empmgmt.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -37,8 +38,15 @@ public class GetEmployeesByName extends HttpServlet {
 			List<Employees> lst = SelectEmployees.getInstance().selectEmployeesBySearchName(findName);
 			
 			String json = new ResponseJson().makeJsonStringEntireEmployeesData(lst);
-			
+		
 			System.out.println(json);
+			
+			//response 객체를 통해 json을 출력한다.
+			response.setContentType("application/json; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.print(json);
+			out.flush();
+			out.close();
 			
 		} catch (NamingException | SQLException e) {
 			// TODO Auto-generated catch block
