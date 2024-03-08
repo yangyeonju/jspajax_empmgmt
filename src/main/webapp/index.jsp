@@ -48,7 +48,7 @@
 			getEntireEmployeesData(orderMethod);
 
 		})
-		
+
 		//saveEmpModalClose 버튼을 클릭하면 신규사원저장 모달을 닫아야 한다
 		$('.saveEmpModalClose').click(function() {
 			$('#saveEmpModal').hide();
@@ -218,7 +218,6 @@
 	right: 20px;
 	cursor: pointer;
 }
-
 </style>
 </head>
 <body>
@@ -271,11 +270,34 @@
 				<!-- Modal Header -->
 				<div class="modal-header">
 					<h4 class="modal-title">신규 사원 등록</h4>
-					<button type="button" class="btn-close saveEmpModalClose" data-bs-dismiss="modal"></button>
+					<button type="button" class="btn-close saveEmpModalClose"
+						data-bs-dismiss="modal"></button>
 				</div>
 
 				<!-- Modal body -->
-				<div class="modal-body">등록할 사원 정보 입력하세요</div>
+				<div class="modal-body">
+					<div class="mb-3 mt-3">
+						<label for="savefirstName" class="form-label">firstName:</label> <input
+							type="text" class="form-control" id="savefirstName">
+					</div>
+					<div class="mb-3 mt-3">
+						<label for="savelastName" class="form-label">lastName:</label> <input
+							type="text" class="form-control" id="savelastName">
+					</div>
+					<div class="mb-3 mt-3">
+						<label for="saveEmail" class="form-label">email:</label> <input
+							type="text" class="form-control" id="saveEmail">
+					</div>
+					<div class="mb-3 mt-3">
+						<label for="savePhoneNumber" class="form-label">phoneNumber:</label> <input
+							type="text" class="form-control" id="savePhoneNumber">
+					</div>
+					<div class="mb-3 mt-3">
+						<label for="saveHireDate" class="form-label">hireDate:</label>
+						<input type="date" class="form-control" id="saveHireDate" />
+					</div>
+					
+				</div>
 
 				<!-- Modal footer -->
 				<div class="modal-footer">
