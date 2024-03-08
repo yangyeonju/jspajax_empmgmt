@@ -75,6 +75,7 @@ public class SelectEmployees {
 	// 이름으로 사원 데이터를 조회하는 기능
 	// 이름이 포함된 사원을 검색하는 메서드
 	// 0명나올수도있고1명나올수도있고많이나올수도있다
+	//이름과 성에 searchName이 포하된 사원을 검색하는 메서드
 	public List<Employees> selectEmployeesBySearchName(String searchName) throws NamingException, SQLException {
 
 		List<Employees> empList = new ArrayList<Employees>();
@@ -84,14 +85,18 @@ public class SelectEmployees {
 		Connection con = db.dbOpen(); // -스트림객체
 
 		// 2.쿼리문 준비
-		String query = "select e.*, d.department_name " + "from employees e, departments d "
-				+ "where e.department_id = d.department_id " + "and e.first_name like ?";
+		String query = "select e.*, d.department_name "
+				+ "from employees e, departments d "
+				+ "where e.department_id = d.department_id "
+				+ "and (lower(e.first_name) like lower(?) or lower(e.last_name) like lower(?)) "
+				+ "order by employee_id";
 
 		// 3.PrepareStatement 객체 : 연결된 db에 쿼리문 전송하고 실행하고 결과를 얻어옴 -스트림객체
 		PreparedStatement pstmt = con.prepareStatement(query);
 
 		// 실행하기전에 매개변수 세팅
 		pstmt.setString(1, "%" + searchName + "%");
+		pstmt.setString(2, "%" + searchName + "%");
 
 		// 4.쿼리문 실행
 		// 5.ResultSet에 결과 담기 -스트림객체
