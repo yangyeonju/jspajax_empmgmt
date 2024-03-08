@@ -17,28 +17,41 @@
 <script>
 	let empData = null; //전체 사원 목록
 
-
 	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
 		getEntireEmployeesData();
 
 		//keyup이 되면 evt가 실행된다.
-		
 		$(".searchName").keyup(function(evt) {
 			//.searchName (input)의 value값을 변수에 넣어줌.
 			let searchName = $(this).val();
-			
+
 			//1글자만 입력했을때 실행되는게 아니라 3글자입력했을때부터 찾도록 할 예정.
 			//검색할 사원의 이름을입력받는곳에 문자열이 입력되고 그 문자열의 길이가 3이상이면
-			if(searchName.length >= 2){
+			if (searchName.length >= 2) {
 				getEmployeesByName(searchName);
 			}
+
+			if (searchName.length == 0) {
+				//검색어가 없다면
+				outputEntireEmployees();
+			}
 		});
-	
+		
+		//라디오 버튼을 클릭하면 다음의 함수 실행
+		$(".orderMethod").click(function() {
+			//정렬 라디오 버튼을 클릭하면 클릭한 라디오 버튼의 value값을 얻어옴
+			//console.log($(this).val());
+			//orderMethod = 정렬하는 방
+			let orderMethod = $(this).val();
+			//정렬만 바뀌는거지 전체데이터를 얻어오는 것은 똑같다. 정렬의 값을 보내면서 전체데이터 출력함수 호출
+			getEntireEmployeesData(orderMethod);
+			
+		})
+
 	});
-	
-	
-	function getEmployeesByName(searchName){
+
+	function getEmployeesByName(searchName) {
 		// 서블릿에게 이름에 searchName이 포함된 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
 		$.ajax({
 			url : './getEmployeeByName.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
@@ -51,19 +64,30 @@
 			success : function(data) { // data(json)
 				// 통신 성공하면 실행할 내용들....
 				console.log(data);
-				
+
 				outputEntireEmployees(data);
 			}
 		});
 	}
-	
 
-	function getEntireEmployeesData() {
+	function getEntireEmployeesData(orderMethod) {
+		//orderMethod가 있을수도 없을수도 있다
+		if(orderMethod == null){
+			//정렬기능 라디오 버튼을 클릭하지 않았다면 (제일 처음 수행될 때) 사번으로 정렬되도록 한다
+			orderMethod = 'empNo';
+		}
+		
+		console.log(orderMethod);
+		
 		// 서블릿에게 전체 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
 		$.ajax({
 			url : './getEntireEmployees.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
 			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
 			dataType : 'json', // 수신받을 데이터의 타입
+			data : {
+				//서블렛에게 보낼 orderMethod 데이터를 객체로 보낸다.
+				"orderMethod" : orderMethod
+			},
 			success : function(data) { // data(json)
 				// 통신 성공하면 실행할 내용들....
 				console.log(data);
@@ -75,28 +99,27 @@
 		});
 	}
 
-	
 	function outputEntireEmployees(data) {
 		let output = '';
 		let employees = null;
-		
+
 		//메서드 오버로딩이 없어서 이렇게 만들어야 한다.
-		if(data != null){
+		if (data != null) {
 			//이름으로 검색할 때
 			//data.employees 가 배열
 			//넘겨받은 데이터로출력
 			employees = data.employees;
-		}else {
+		} else {
 			//전체 사원으로 검색할 때
 			//전역변수 데이터로 출력
 			employees = empData.employees;
 		}
-		
+
 		output += "<table class='table table-hover'><thead>";
 		output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
 		output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th></tr></thead>";
 		output += "<tbody>";
-		
+
 		// 사원수만큼 반복하여 출력
 		//data는 json 그자체이고 data.employees 해야 배열이 나옴
 		$.each(employees, function(i, e) {
@@ -168,7 +191,17 @@
 	margin-top: 20px;
 }
 
-.searchName input {text-align:center; font-size:15px; }
+.searchName input {
+	text-align: center;
+	font-size: 15px;
+}
+
+.sortEmp {
+	margin-top: 20px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;	
+}
 </style>
 </head>
 <body>
@@ -181,8 +214,24 @@
 		<!-- ajax는 form태그를 쓰지 않는다! -->
 		<div class="row">
 			<div class="col">
-				<input type="text" class="form-control searchName" placeholder="찾을 사원의 이름을 입력하세요."
-					name="findEmpName">
+				<input type="text" class="form-control searchName"
+					placeholder="찾을 사원의 이름을 입력하세요." name="findEmpName">
+			</div>
+		</div>
+		<div class="sortEmp">
+			<div class="form-check">
+				<input type="radio" class="form-check-input orderMethod" id="radio1"
+					name="orderMethod" value="empNo" checked>사번(오름차순) <label
+					class="form-check-label" for="radio1"></label>
+			</div>
+			<div class="form-check">
+				<input type="radio" class="form-check-input orderMethod" id="radio2"
+					name="orderMethod" value="hireDate">입사일(내림차순) <label
+					class="form-check-label" for="radio2"></label>
+			</div>
+			<div class="form-check">
+				<input type="radio" class="form-check-input orderMethod" name="orderMethod"
+					value="salary">급여(내림차순) <label class="form-check-label"></label>
 			</div>
 		</div>
 	</div>

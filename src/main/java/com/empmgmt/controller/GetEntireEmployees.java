@@ -29,8 +29,12 @@ public class GetEntireEmployees extends HttpServlet {
     //요청을 받고 응답을 하는 일만 하는 곳
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//매개변수 가져올것이 없음.
-		System.out.println("!");
-		SelectEmployees dao = SelectEmployees.getInstance();
+		//System.out.println("!");
+		//selectEntireEmployees()하기전에 매개변수먼저 수집
+		String orderMethod = request.getParameter("orderMethod");
+		System.out.println(orderMethod + "정렬로 정렬하여 전체 사원 데이터 출력하자");
+		
+		SelectEmployees dao = SelectEmployees.getInstance(); //dao단 메서드 selectEntireEmployees() 호출
 		//여기는 서블릿이라 response 응답. 가능! 예외처리를 더이상 미루지 않아도 된다. 
 		try {
 			List<Employees> lst = dao.selectEntireEmployees();
