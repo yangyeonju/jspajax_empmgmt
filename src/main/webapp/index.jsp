@@ -17,6 +17,7 @@
 <script>
 	let empData = null; //전체 사원 목록
 
+
 	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
 		getEntireEmployeesData();
@@ -29,7 +30,7 @@
 			
 			//1글자만 입력했을때 실행되는게 아니라 3글자입력했을때부터 찾도록 할 예정.
 			//검색할 사원의 이름을입력받는곳에 문자열이 입력되고 그 문자열의 길이가 3이상이면
-			if(searchName.length >= 3){
+			if(searchName.length >= 2){
 				getEmployeesByName(searchName);
 			}
 		});
@@ -50,6 +51,8 @@
 			success : function(data) { // data(json)
 				// 통신 성공하면 실행할 내용들....
 				console.log(data);
+				
+				outputEntireEmployees(data);
 			}
 		});
 	}
@@ -66,23 +69,37 @@
 				console.log(data);
 				//전역변수에 data 넣기
 				empData = data;
-				outputEntireEmployees(data);
+				outputEntireEmployees();
 
 			}
 		});
 	}
 
 	
-	function outputEntireEmployees() {
+	function outputEntireEmployees(data) {
 		let output = '';
+		let employees = null;
+		
+		//메서드 오버로딩이 없어서 이렇게 만들어야 한다.
+		if(data != null){
+			//이름으로 검색할 때
+			//data.employees 가 배열
+			//넘겨받은 데이터로출력
+			employees = data.employees;
+		}else {
+			//전체 사원으로 검색할 때
+			//전역변수 데이터로 출력
+			employees = empData.employees;
+		}
+		
 		output += "<table class='table table-hover'><thead>";
 		output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
 		output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th></tr></thead>";
 		output += "<tbody>";
-
+		
 		// 사원수만큼 반복하여 출력
 		//data는 json 그자체이고 data.employees 해야 배열이 나옴
-		$.each(empData.employees, function(i, e) {
+		$.each(employees, function(i, e) {
 			//i는 몇번째, $(e)는 사원 정보
 			console.log($(e));
 			output += "<tr>";
