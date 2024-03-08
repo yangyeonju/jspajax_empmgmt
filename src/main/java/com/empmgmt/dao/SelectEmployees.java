@@ -32,7 +32,7 @@ public class SelectEmployees {
 	// =====================================================================
 	// 전체 사원 데이터 조회하는 기능
 	// GetEntireEmployees.java와는 패키지도 다르고 부모관계도 아님. 그래서 public으로 만든다.
-	public List<Employees> selectEntireEmployees() throws NamingException, SQLException {
+	public List<Employees> selectEntireEmployees(String orderMethod) throws NamingException, SQLException {
 		// select * from employees 쿼리문을 실행한 후 결과를 반환해줘야 한다.
 		// 서블릿으로 보내려면 한꺼번에 담아서 보내야한다. - 사원 전체 리스트를 담을 객체
 		List<Employees> empList = new ArrayList<Employees>();
@@ -42,8 +42,17 @@ public class SelectEmployees {
 		Connection con = db.dbOpen(); // -스트림객체
 
 		// 2.쿼리문 준비
+		//넘겨지는 매개변수 orderMethod의 값에 따라 쿼리문이 달라진다 => 동적 SQL
 		String query = "select e.*, d.department_name " + "from employees e, departments d "
-				+ "where e.department_id = d.department_id order by employee_id";
+				+ "where e.department_id = d.department_id order by ";
+		
+		if(orderMethod.equals("empNo")) {
+			 query += " employee_id";
+		} else if (orderMethod.equals("salary")) {
+			query += " salary desc";
+		} else if (orderMethod.equals("hireDate")) {
+			query += " hire_date desc";
+		}
 
 		// 3.PrepareStatement 객체 : 연결된 db에 쿼리문 전송하고 실행하고 결과를 얻어옴 -스트림객체
 		PreparedStatement pstmt = con.prepareStatement(query);
