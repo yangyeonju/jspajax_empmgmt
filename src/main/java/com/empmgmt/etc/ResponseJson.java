@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.empmgmt.vo.Employees;
+import com.empmgmt.vo.Jobs;
 
 public class ResponseJson {
 
@@ -47,10 +48,29 @@ public class ResponseJson {
 		
 		jsonObj.put("employees", employees); // jsonObj에(바깥 껍데기) JSONArray를 "employees"라는 이름으로 저장.
 		
-		
 		//이제 jsonObj를 json문자열로 만들어서 리턴해준다.
 		return jsonObj.toJSONString();
 		
+	}
+	
+	//List<Jobs>를 받아 simple json 라이브러리를 이용하여 json 문자열로 만들어 반환한다.
+	public String makeJsonStringJobsData(List<Jobs> jobList) {
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jobsArr = new JSONArray();
+		
+		for(Jobs j : jobList) {
+			JSONObject job = new JSONObject();
+			job.put("job_id", j.getJobId());
+			job.put("job_title", j.getJobTitle());
+			job.put("min_salary", j.getMinSalary() + "");
+			job.put("max_salary", j.getMaxSalary() + "");
+			
+			jobsArr.add(job);
+		}
+		
+		jsonObj.put("jobs", jobsArr);
+		
+		return jsonObj.toJSONString();
 	}
 	
 }

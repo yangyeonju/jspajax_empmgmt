@@ -16,6 +16,7 @@
 <title>Insert title here</title>
 <script>
 	let empData = null; //전체 사원 목록
+	let jobsInfo = null; //jobs 정보 목록
 
 	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
@@ -47,14 +48,64 @@
 			//정렬만 바뀌는거지 전체데이터를 얻어오는 것은 똑같다. 정렬의 값을 보내면서 전체데이터 출력함수 호출
 			getEntireEmployeesData(orderMethod);
 
-		})
+		});
 
 		//saveEmpModalClose 버튼을 클릭하면 신규사원저장 모달을 닫아야 한다
 		$('.saveEmpModalClose').click(function() {
 			$('#saveEmpModal').hide();
+		});
+		
+		//유저가 사원을 신규 저장시 직급을 선택했다면..
+		$('#saveJobIdSelectTag').change(function() {
+			//alert("!");
+			let tmpSelected = $(this).val();
+			if(tmpSelected == -1){
+				//직급이 선택되지 않았을 때
+				alert("직급을 선택하세요");
+			}else{
+				//직급을 선택해야 해당 직급의 최소/최대 급여를 알 수 있다.
+				//이 시점에서 Input type range 만들 수 있다..
+				makeSalaryRangeTag(tmpSelected);
+			}
+		});
+		
+		//급여 슬라이딩 값이 변하면 선택된 급여가 출력되도록 한다
+		/* $("#salary").change(function() {
+			alert("!");
+			let sal = $(this).val();
+			$(".selectedSalary").html(sal);
+		}) */
+		
+		//동적으로 만들었을 땐 onchange 걸자
+		$('.rangeSalaryTag').on('change', 'input', function(evt) {
+			$(".selectedSalary").html(evt.target.value);
 		})
-
+		
+		
 	});
+	
+	//인풋타입range로 태그를 만드는 함수 (급여입력용)
+	function makeSalaryRangeTag(selectedJobId){
+		//alert(selectedJobId); // 배열이므로 반복문 돌려서 selectedJobId를 찾아내야한다.
+		let minSal = 0, maxSal = 0;
+		let jobs = jobsInfo.jobs;
+		
+		$.each(jobs, function(i, e) {
+			if(selectedJobId == e.job_id) {
+				//선택된 직급이 배열에서와 직급이랑 같은걸 찾아야 한다
+				minSal = e.min_salary;
+				maxSal = e.max_salary;
+				
+			}
+		})
+		
+		let output = `<input type="range" class="form-range" min="\${minSal}" max="\${maxSal}" step="100" id="salary">`;
+		$('.saveMinSal').html(minSal);
+		$('.saveMaxSal').html(maxSal);
+		
+		$('.rangeSalaryTag').html(output);
+		
+	}
 
 	function getEmployeesByName(searchName) {
 		// 서블릿에게 이름에 searchName이 포함된 사원데이터를 달라고 요청 (ajax : 비동기데이터 통신)
@@ -191,8 +242,45 @@
 
 	}
 
+	//신규사원 저장을 위해 모달창 오픈
 	function saveModalOpen() {
+		//모달창 보이기 전에 jobs테이블에서 데이터를 가져온다
+		getJobsInfo(); //얘가 다 되어야 아래꺼를 호출해야 한다 동기방식으로 하기
+		makeJobSelectTag();
+		
+		//select 박스에 option태그 만들어야 함. 함수로
 		$("#saveEmpModal").show(200);
+	}
+	
+	
+	function makeJobSelectTag(){
+		let jobs = jobsInfo.jobs; //json에서 배열만 가져옴
+		
+		let output = "<option value='-1'>--- 직급을 선택하세요 ---</option>";
+		
+		$.each(jobs, function(i, e) {
+			//jobs배열에서 하나씩 가져와서 e에 저장한다
+			//console.log($(e));
+			output += `<option value='\${e.job_id}'>\${e.job_title }</option>`;
+		});
+		
+		$("#saveJobIdSelectTag").html(output);
+		
+	}
+	
+	function getJobsInfo(){
+		$.ajax({
+			url : './getJobsInfo.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
+			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
+			dataType : 'json', // 수신받을 데이터의 타입
+			async : false, //동기 방식 수행
+			success : function(data) { // data(json)
+				// 통신 성공하면 실행할 내용들....
+				console.log(data);
+				jobsInfo = data;
+				
+			}
+		});
 	}
 </script>
 <style>
@@ -217,6 +305,12 @@
 	bottom: 20px;
 	right: 20px;
 	cursor: pointer;
+}
+
+.minSalMaxSal{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 </style>
 </head>
@@ -296,7 +390,21 @@
 						<label for="saveHireDate" class="form-label">hireDate:</label>
 						<input type="date" class="form-control" id="saveHireDate" />
 					</div>
-					
+					<div class="mb-3 mt-3">
+						<label for="saveJobId" class="form-label">jobId:</label>
+						<select id="saveJobIdSelectTag" class="form-select">
+							<!-- 프로그램 시작하면 바로 jobs테이블에서 데이터를 불러오거나, 모달창 플러스 부분 클릭하면 불러온다. -->
+						</select>
+					</div>
+					<div class="mb-3 mt-3">
+						<label for="saveSalary" class="form-label">salary: <span class="selectedSalary"></span></label>
+						<div class="rangeSalaryTag"></div>
+						
+						<div class="minSalMaxSal">
+							<span class="saveMinSal"></span>
+							<span class="saveMaxSal"></span>
+						</div>
+					</div>
 				</div>
 
 				<!-- Modal footer -->

@@ -37,7 +37,9 @@ public class GetEntireEmployees extends HttpServlet {
 		SelectEmployees dao = SelectEmployees.getInstance(); //dao단 메서드 selectEntireEmployees() 호출
 		//여기는 서블릿이라 response 응답. 가능! 예외처리를 더이상 미루지 않아도 된다. 
 		try {
+			
 			List<Employees> lst = dao.selectEntireEmployees(orderMethod);
+			
 //			for(Employees e :lst) {
 //				System.out.println(e.toString());
 //			}
