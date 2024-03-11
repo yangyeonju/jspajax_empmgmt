@@ -7,6 +7,7 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.empmgmt.vo.Departments;
 import com.empmgmt.vo.Employees;
 import com.empmgmt.vo.Jobs;
 
@@ -20,7 +21,7 @@ public class ResponseJson {
 		
 		for(Employees e : lst) {
 			//얘를반복문이 아닌 위로 만들면 한명의 사원 데이터마다 데이터가 저장되어야하는데
-			//한 변수에사원데이터가 계속 오버라이트 된다.
+			//한 변수에사원데이터가 계속 오버라이트 된다..
 			JSONObject employee = new JSONObject(); // 한명의 사원 데이터가 들어가는 객체
 			//jsonObject는 HashMap 상속받음. 그래서 employee에 데이터를 더하려면 put을 써야 함.
 			//e.getEmployeeId()는 int타입이니까 문자타입으로 만들려면.. 제일빠른 방법은 뒤에 빈 문자열 더해주기.
@@ -69,6 +70,26 @@ public class ResponseJson {
 		}
 		
 		jsonObj.put("jobs", jobsArr);
+		
+		return jsonObj.toJSONString();
+	}
+	
+	//List<Department>를 받아 문자열로 반환하는 메서드
+	public String makeJsonStringDeptData(List<Departments> lst) {
+		JSONObject jsonObj = new JSONObject();
+		JSONArray departments = new JSONArray();
+		
+		for(Departments d :lst) {
+			JSONObject department = new JSONObject();
+			department.put("department_id", d.getDepartmentId() + "");
+			department.put("department_name", d.getDepartmentName());
+			department.put("manager_id", d.getManagerId() + "");
+			department.put("location_id", d.getLocationId() + "");
+			
+			departments.add(department);
+		}
+		
+		jsonObj.put("departments", departments);
 		
 		return jsonObj.toJSONString();
 	}
