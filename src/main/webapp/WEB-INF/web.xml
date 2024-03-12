@@ -22,18 +22,20 @@
 		<res-auth>Container</res-auth>
 	</resource-ref>
 
-	<!-- utf-8 인코딩 필터 설정 -->
-	<!-- <filter>
-		<filter-name>EncodingFilter</filter-name>
-		<filter-class>com.empmgmt.etc.EncodingFilter</filter-class>
+	<!-- contex.xml은 첫웹사이트가 실행될 때 단 한번 읽는데 web.xml은 request가 올때마다 처리를 해야한다 -->
+	<!-- 한글설정 필터추가 -->
+	<filter>
+		<filter-name>Set Character Encoding</filter-name>
+		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>utf-8</param-value>
 		</init-param>
 	</filter>
-	EncodingFilter 맵핑하기(어떤 pattern의 요청이 왔을 때 동작하게 할 것인지)
+
 	<filter-mapping>
-		<filter-name>EncodingFilter</filter-name>
-		<url-pattern>/*</url-pattern>context 하위의 모든 요청에 대해 수행
-	</filter-mapping> -->
+		<filter-name>Set Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- 한글설정 END -->
 </web-app>
