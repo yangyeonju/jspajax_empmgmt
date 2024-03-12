@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.empmgmt.dao.SelectEmployees;
+import com.empmgmt.dao.EmployeesCRUD;
 import com.empmgmt.etc.ResponseJson;
 import com.empmgmt.vo.Employees;
 
@@ -34,7 +34,7 @@ public class GetEntireEmployees extends HttpServlet {
 		String orderMethod = request.getParameter("orderMethod");
 		System.out.println(orderMethod + "정렬로 정렬하여 전체 사원 데이터 출력하자");
 		
-		SelectEmployees dao = SelectEmployees.getInstance(); //dao단 메서드 selectEntireEmployees() 호출
+		EmployeesCRUD dao = EmployeesCRUD.getInstance(); //dao단 메서드 selectEntireEmployees() 호출
 		//여기는 서블릿이라 response 응답. 가능! 예외처리를 더이상 미루지 않아도 된다. 
 		try {
 			

@@ -19,9 +19,148 @@
 	let jobsInfo = null; //jobs 정보 목록
 	let deptData = null; //전체 부서 목록
 
+	//신규 사원을 실제로 저장하기 위해 서블릿을 호출하는 메서드
+	function saveEmployee() {
+		//유저가 입력한값들을 얻어와서 유효성 검사후 지역변수에 저장
+		let firstName = $("#savefirstName").val();
+
+		//lastName not null 처리
+		let lastName = $("#savelastName").val();
+		if (lastName.length == 0) {
+			alert('lastName은 필수 항목입니다.');
+			$("#savelastName").focus();
+		}
+
+		//이메일 제약조건1 not null 처리
+		//이메일 제약조건2 unique 해야한다. 유저가 입력하면 유니크한지 아닌지 알아보면 된다. keyup이벤트로 db갔다와서 체크하는걸로.
+		let email = $("#saveEmail").val();
+		if (email.length == 0) {
+			alert('이메일은 필수 항목입니다.');
+			$("#saveEmail").focus();
+		}
+
+		let phoneNumber = $("#savePhoneNumber").val();
+		let hireDate = $("#saveHireDate").val();
+
+		//hireDate는 not null 처리
+		if (hireDate == '') {
+			alert('입사일은 필수입니다.');
+			$("#saveHireDate").focus();
+		}
+
+		//jobId not null 처리
+		let jobId = $("#saveJobIdSelectTag").val();
+		if (jobId == "-1") {
+			alert('직급 입력은 필수입니다.');
+			$("#saveJobIdSelectTag").focus();
+		}
+
+		let salary = $("#salary").val();
+		let commissionPct = $("#saveComm").val();
+
+		//
+		let managerId = $("#saveManagerIdSelectTag").val();
+		if (managerId == "-1") {
+			alert("직속성사를 선택하세요");
+			$("#saveManagerIdSelectTag").focus();
+		}
+
+		//
+		let departmentId = $("#saveDepartmentsTag").val();
+		if (departmentId == "-1") {
+			alert("부서를 선택하세요!");
+			$("#saveDepartmentsTag").focus();
+		}
+
+		//자바스크립트 객체 생성
+		let employee = {
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"email" : email,
+			"phoneNumber" : phoneNumber,
+			"hireDate" : hireDate,
+			"jobId" : jobId,
+			"salary" : salary,
+			"commissionPct" : commissionPct,
+			"managerId" : managerId,
+			"departmentId" : departmentId
+		};
+
+		// employee가 다 입력된 시점
+		console.log(employee);
+
+		//이번엔 데이터를 받아오는게 아닌 보내는것이니까 post
+		$.ajax({
+			url : './saveEmployee.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				"firstName" : firstName,
+				"lastName" : lastName,
+				"email" : email,
+				"phoneNumber" : phoneNumber,
+				"hireDate" : hireDate,
+				"jobId" : jobId,
+				"salary" : salary,
+				"commissionPct" : commissionPct,
+				"managerId" : managerId,
+				"departmentId" : departmentId
+			},
+			success : function(data) { // data(json)
+				// 통신 성공하면 실행할 내용들....
+				console.log(data);
+
+			}
+		});
+
+	}
+	
 	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
 		getEntireEmployeesData();
+
+		//사원 신규 입력 저장 버튼을 클릭하면
+		$(".saveEmpBtn").click(function() {
+			saveEmployee();
+		});
+
+		//신규사원 저장시 유저가 이메일을 입력할 때
+		$("#saveEmail").keyup(function() {
+			let userInputEmail = $(this).val().toUpperCase();
+
+			//한자한자입력했을 때마다 서블릿으로 보내기에는 너무 자주하는것
+			//유저가 입력한 이메일이 4글자 이상일때 중복인지 검사
+			if (userInputEmail.length >= 4) {
+
+				$.ajax({
+							url : './duplicateEmail.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
+							type : 'get', // 통신방식(GET, POST, PUT, DELETE)
+							dataType : 'json', // 수신받을 데이터의 타입
+							//서블릿으로 전송하는 데이터
+							data : {
+								"userInputEmail" : userInputEmail
+							},
+							success : function(data) { // data(json)
+							// 통신 성공하면 실행할 내용들....
+							console.log(data);
+
+							if (data.isDuplicate == "true") {
+								//에러 메세지 출력, 다시 입력
+								let output = `<div class='error'>이메일이 유효하지 않습니다.</div>`;
+								$(".duplicateEmailMsg")
+								.html(output);
+								$("#saveEmail").focus();
+							} else if (data.isDuplicate == "false") {
+								let output = `<div class='error'>사용 가능한 이메일입니다.</div>`;
+								$(".duplicateEmailMsg")
+								.html(output);
+							}
+						}
+					});
+
+			}
+
+		});
 
 		//keyup이 되면 evt가 실행된다.
 		$(".searchName").keyup(function(evt) {
@@ -250,28 +389,26 @@
 		makeManagerSelectTag();
 		getDepartmentsInfo();
 		makeDeptSelectTag();
-		
+
 		//select 박스에 option태그 만들어야 함. 함수로
 		$("#saveEmpModal").show(200);
 	}
-	
-	
-	function makeDeptSelectTag(){
-		
+
+	function makeDeptSelectTag() {
+
 		let output = "<option value='-1'>--- 부서를 선택하세요 ---</option>";
 		let departments = deptData.departments; //부서 배열
-		
-		$.each(departments, function(i, e) {
+
+		$.each(departments,function(i, e) {
 			output += `<option value='\${e.department_id}'> \${e.department_name} </option>`
 		});
-		
+
 		$("#saveDepartmentsTag").html(output);
-		
+
 	}
-	
-	
+
 	//부서 정보를 json으로 얻어오는 함수
-	function getDepartmentsInfo(){
+	function getDepartmentsInfo() {
 		$.ajax({
 			url : './getDeptInfo.do', // 데이터를 송수신할 서버의 주소 (서블릿 매핑주소)
 			type : 'get', // 통신방식(GET, POST, PUT, DELETE)
@@ -281,23 +418,25 @@
 				// 통신 성공하면 실행할 내용들....
 				console.log(data);
 				deptData = data;
-				
+
 			}
 		});
 	}
 
-	function makeManagerSelectTag(){
+	function makeManagerSelectTag() {
 		let output = "<option value='-1'>--- 상사를 선택하세요 ---</option>";
 		let employees = empData.employees;
-		
-		$.each(employees, function(i, e) {
-			output += `<option value="\${e.employee_id}">\${e.first_name}, \${e.last_name} (\${e.employee_id})</option>`;
-		});
-		
+
+		$
+				.each(
+						employees,
+						function(i, e) {
+							output += `<option value="\${e.employee_id}">\${e.first_name}, \${e.last_name} (\${e.employee_id})</option>`;
+						});
+
 		$("#saveManagerIdSelectTag").html(output);
 	}
-	
-	
+
 	function makeJobSelectTag() {
 		let jobs = jobsInfo.jobs; //json에서 배열만 가져옴
 
@@ -356,6 +495,10 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+}
+
+.duplicateEmailMsg {
+	color: red;
 }
 </style>
 </head>
@@ -426,6 +569,7 @@
 					<div class="mb-3 mt-3">
 						<label for="saveEmail" class="form-label">email:</label> <input
 							type="text" class="form-control" id="saveEmail">
+						<div class="duplicateEmailMsg"></div>
 					</div>
 					<div class="mb-3 mt-3">
 						<label for="savePhoneNumber" class="form-label">phoneNumber:</label>
@@ -452,19 +596,20 @@
 					</div>
 
 					<div class="mb-3 mt-3">
-						<label for="saveComm" class="form-label">Commission(%):</label> 
-						<input type="number" class="form-control" id="saveComm" min="0" max="100" />
+						<label for="saveComm" class="form-label">Commission(%):</label> <input
+							type="number" class="form-control" id="saveComm" min="0"
+							max="100" />
 					</div>
-					
+
 					<div class="mb-3 mt-3">
-						<label for="saveManagerId" class="form-label">Manager:</label> 
-						<select id="saveManagerIdSelectTag" class="form-select">
+						<label for="saveManagerId" class="form-label">Manager:</label> <select
+							id="saveManagerIdSelectTag" class="form-select">
 							<!-- 프로그램 시작하면 바로 jobs테이블에서 데이터를 불러오거나, 모달창 플러스 부분 클릭하면 불러온다. -->
 						</select>
 					</div>
-					
+
 					<div class="mb-3 mt-3">
-						<label for="saveDepartments" class="form-label">Departments:</label> 
+						<label for="saveDepartments" class="form-label">Departments:</label>
 						<select id="saveDepartmentsTag" class="form-select">
 							<!-- 프로그램 시작하면 바로 jobs테이블에서 데이터를 불러오거나, 모달창 플러스 부분 클릭하면 불러온다. -->
 						</select>
@@ -474,8 +619,9 @@
 
 				<!-- Modal footer -->
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger saveEmpModalClose"
+					<button type="button" class="btn btn-light saveEmpModalClose"
 						data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger saveEmpBtn">Save</button>
 				</div>
 
 			</div>

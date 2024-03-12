@@ -94,4 +94,35 @@ public class ResponseJson {
 		return jsonObj.toJSONString();
 	}
 	
+	//boolean result을 받아 중복인지 아닌지 json문자열로 반환하는 메서드
+	public String makeJsonStringDuplicateEmail(boolean result) {
+		JSONObject jsonObj = new JSONObject();
+		
+		if(result == true) {
+			jsonObj.put("isDuplicate", "true");			
+		}else {
+			jsonObj.put("isDuplicate", "false");
+		}
+		
+		return jsonObj.toJSONString();
+		
+	}
+	
+	
+	//boolean result를 받아 저장 성공인지 실패인지 json문자열로 반환하는 메서드
+	public String makeJsonStringIsSuccess(boolean result) {
+		JSONObject jsonObj = new JSONObject();
+		
+		if(result == true) {
+			jsonObj.put("success", "true");			
+		} else {
+			jsonObj.put("success", "false");
+		}
+		
+		return jsonObj.toJSONString();
+	}
+	
+	
+	
+	
 }

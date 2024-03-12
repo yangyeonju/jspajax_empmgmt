@@ -30,7 +30,8 @@ public class SelectDepartments {
 		
 		List<Departments> lst = new ArrayList<Departments>();
 		
-		Connection con = DBConnection.getInstance().dbOpen();
+		DBConnection db = DBConnection.getInstance();
+		Connection con = db.dbOpen();
 		
 		String q = "select * from departments";
 		
@@ -46,9 +47,12 @@ public class SelectDepartments {
 					rs.getInt("LOCATION_ID")));
 		}
 		
-		for(Departments d : lst) {
-			System.out.println(d.toString());
-		}
+//		for(Departments d : lst) {
+//			System.out.println(d.toString());
+//		}
+		
+		//닫았다는 얘기는 정상종료 되었다는 뜻 (commit)
+		db.dbClose(rs, pstmt, con);
 		
 		return lst;
 		

@@ -49,4 +49,10 @@ public class DBConnection {
 		con.close();
 	}
 	
+	public void dbClose(ResultSet rs, PreparedStatement pstmt) throws SQLException {
+		rs.close();
+		pstmt.close();
+	}
+	
+	
 }
