@@ -62,6 +62,7 @@ public class EmployeesCRUD {
 		ResultSet rs = pstmt.executeQuery();
 
 		// 6.5번의 결과를 반환할 준비
+		//아래의 Employee 는 vo
 		while (rs.next()) {
 			empList.add(new Employees(rs.getInt("EMPLOYEE_ID"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"),
 					rs.getString("EMAIL"), rs.getString("PHONE_NUMBER"), rs.getDate("HIRE_DATE"),
@@ -255,6 +256,33 @@ public class EmployeesCRUD {
 		
 		return nextEmpNo;
 	}
+	
+	// ====================================================
+	//사원을 삭제하는 메서드
+	//반환값 삭제 성공이면true실패면 false
+	public boolean deleteEmployee(int empNo) throws NamingException, SQLException {
+		
+		boolean result = false;
+		
+		DBConnection db = DBConnection.getInstance();
+		Connection con = db.dbOpen(); // -스트림객체
+		
+		String query = "delete from employees where employee_id = ?";
+		
+		PreparedStatement pstmt = con.prepareStatement(query);
+		
+		pstmt.setInt(1, empNo);
+		
+		if( pstmt.executeUpdate() == 1 ) {
+			result = true;
+		}
+		
+		db.dbClose(pstmt, con);
+		
+		return result;
+		
+	}
+	
 	
 	
 	// 사번으로 사원 데이터 조회하는 기능

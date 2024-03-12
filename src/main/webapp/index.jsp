@@ -150,10 +150,49 @@
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
 		getEntireEmployeesData();
 
+		//사원삭제 모달창 닫기 버튼을 누르면
+		$(".remModalClose").click(function() {
+			//모달 숨기기
+			$("#removeEmpModal").hide();
+		});
+	
+	
 		//사원 신규 입력 저장 버튼을 클릭하면
 		$(".saveEmpBtn").click(function() {
 			saveEmployee();
 		});
+		
+		//사원 삭제 버튼을 클릭하면
+		$(".remEmpBtn").click(function() {
+			
+			let remEmpNo = $(".removeEmpNo").html();
+			//alert(remEmpNo);
+			
+			$.ajax({
+				url : 'remEmp.do', 
+				type : 'post',
+				dataType : 'json',
+				data : {
+					"remEmpNo" : remEmpNo	
+				},
+				success : function(data) { // data(json)
+					// 통신 성공하면 실행할 내용들....
+					console.log(data);
+				
+					if(data.success == "true"){
+						$("#removeEmpModal").hide();
+						alert("사원이 삭제되었습니다.");
+						
+						getEntireEmployeesData();
+					}else if(data.success = "false"){
+						alert("사원 삭제를 실패했습니다.");
+					}
+				}
+			});
+			
+		});
+		
+		
 
 		//신규사원 저장시 유저가 이메일을 입력할 때
 		$("#saveEmail").keyup(function() {
@@ -325,6 +364,7 @@
 		});
 	}
 
+	//사원 데이터를 출력하는 함수
 	function outputEntireEmployees(data) {
 		let output = '';
 		let employees = null;
@@ -343,7 +383,7 @@
 
 		output += "<table class='table table-hover'><thead>";
 		output += "<tr><th>순번</th><th>사번</th><th>이름</th><th>Email</th><th>전화번호</th><th>입사일</th>";
-		output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th></tr></thead>";
+		output += "<th>직급</th><th>급여</th><th>커미션</th><th>사수</th><th>소속부서</th><th></th><th></th></tr></thead>";
 		output += "<tbody>";
 
 		// 사원수만큼 반복하여 출력
@@ -385,6 +425,10 @@
 
 			//output += `<td>\${e.department_id}</td>`;
 			output += `<td>\${e.department_name}</td>`;
+			//수정 삭제 아이콘
+			output += `<td style="cursor:pointer"><img width="30" height="30" src="https://img.icons8.com/ios-filled/50/edit--v2.png" alt="edit--v2"/></td>`;
+			output += `<td style="cursor:pointer"><img width="30" height="30" src="https://img.icons8.com/ios-filled/50/delete-forever.png" alt="delete-forever" 
+						onclick="remEmpModal(\${e.employee_id});" /></td>`;
 			output += "</tr>";
 		});
 
@@ -393,6 +437,15 @@
 		$(".outputData").html(output);
 	}
 
+	function remEmpModal(empNo){
+		//alert(empNo + "번 사원을 삭제");
+		$(".removeEmpNo").html(empNo);
+		$("#removeEmpModal").show(300);
+	
+		
+		
+	}
+	
 	function findManagerName(managerId) {
 		//managerId: 이름을 찾을 직속상사의 사번
 		//전체사원목록이 있는 배열을 반복하면서 사번이 managerId인 사원의 이름을 찾아 반환한다.
@@ -618,7 +671,7 @@
 					</div>
 					<div class="mb-3 mt-3">
 						<label for="saveSalary" class="form-label">salary: <span
-							class="selectedSalary" ></span></label>
+							class="selectedSalary"></span></label>
 						<div class="rangeSalaryTag"></div>
 
 						<div class="minSalMaxSal">
@@ -658,5 +711,37 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- 사원 삭제를 위한 모달창 -->
+	<div class="modal" id="removeEmpModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title">사원 관리 프로그램</h4>
+					<button type="button" class="btn-close remModalClose"
+						data-bs-dismiss="modal"></button>
+				</div>
+
+				<!-- Modal body -->
+				<div class="modal-body">
+					<div>
+						<span class="removeEmpNo"></span>번 사원을 삭제할까요?
+					</div>
+				</div>
+
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger remEmpBtn"
+						data-bs-dismiss="modal">Delete</button>
+					<button type="button" class="btn btn-light remModalClose"
+						data-bs-dismiss="modal">Cancle</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
 </body>
 </html>

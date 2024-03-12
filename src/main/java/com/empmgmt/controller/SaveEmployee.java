@@ -40,6 +40,7 @@ public class SaveEmployee extends HttpServlet {
 		// System.out.println(request.getParameter("employee") + "를 저장하자");
 		// 그래서json으로 주고받는것임
 
+		// view단(jsp)에서 넘어온 매개변수.. 
 		// request객체를 통해 넘어온 매개변수를 수집 -> insert 할 수 있는 데이터타입 변환
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
@@ -71,11 +72,14 @@ public class SaveEmployee extends HttpServlet {
 		int departmentId = Integer.parseInt(request.getParameter("departmentId"));
 
 		
-		// dao단으로 매개변수를 전달하기 위해 Employee 객체로 묶자
+		// dao단으로 매개변수를 전달하기 위해 Employee 객체로 묶자 (View단에서 온 : dto)
+		//그래서 아래의 Employees 객체는 dto 역할을 한다
+		
 		// 1)신규 사원 저장을 위해 PK를 먼저 얻어와야 한다. 
 		// 2)1번에서 얻어온 PK 값과 아래의 emp 데이터를 함께 insert 해야함 
 		// 3)하지만 이곳에서는 트랙잰션 설정을 할 수 없다. Connection 객체가 없다.)
 		// 4)그래서 Jsp에서는 아래의 방법으로 처리한다
+		
 		Employees emp = new Employees(-1, firstName, lastName, email, phoneNumber, hireDate, jobId, salary,
 				commissionPct, managerId, departmentId, null);
 		

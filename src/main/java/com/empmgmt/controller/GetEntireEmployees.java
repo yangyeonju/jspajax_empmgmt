@@ -32,7 +32,7 @@ public class GetEntireEmployees extends HttpServlet {
 		//System.out.println("!");
 		//selectEntireEmployees()하기전에 매개변수먼저 수집
 		String orderMethod = request.getParameter("orderMethod");
-		System.out.println(orderMethod + "정렬로 정렬하여 전체 사원 데이터 출력하자");
+		//System.out.println(orderMethod + "정렬로 정렬하여 전체 사원 데이터 출력하자");
 		
 		EmployeesCRUD dao = EmployeesCRUD.getInstance(); //dao단 메서드 selectEntireEmployees() 호출
 		//여기는 서블릿이라 response 응답. 가능! 예외처리를 더이상 미루지 않아도 된다. 

@@ -53,6 +53,11 @@ public class DBConnection {
 		rs.close();
 		pstmt.close();
 	}
+
+	public void dbClose(PreparedStatement pstmt, Connection con) throws SQLException {
+		pstmt.close();
+		con.close();
+	}
 	
 	
 }
