@@ -31,7 +31,8 @@ public class SaveEmployee extends HttpServlet {
 			throws ServletException, IOException {
 		
 		//post방식이기 때문에 
-		request.setCharacterEncoding("utf-8");
+//		request.setCharacterEncoding("utf-8");
+		
 		//filter라는 걸 만들어보자
 		
 		

@@ -109,11 +109,42 @@
 			success : function(data) { // data(json)
 				// 통신 성공하면 실행할 내용들....
 				console.log(data);
-
+				if(data.success == "true"){
+					alert("성공적으로 사원이 저장되었습니다.");
+					saveModalInit();
+					//모달창이 닫아진 후에 추가된 사원이 보이게 하자
+					$("#saveEmpModal").hide();
+					getEntireEmployeesData();
+				}else if(data.success == 'false'){
+					alert("사원 저장에 실패했습니다.");
+				}
 			}
 		});
 
 	}
+	
+	//사원 저장 모달창 초기화
+	function saveModalInit(){
+		$("#savefirstName").val('');
+		$("#savelastName").val('');
+		$("#saveEmail").val('');
+		$("#savePhoneNumber").val('');
+		$("#saveHireDate").val('');
+		
+		let jobSelectTag = document.getElementById("saveJobIdSelectTag");
+		jobSelectTag.selectedIndex = 0;
+		
+		$("#salary").val('');
+		$("#saveComm").val('');
+		
+		let saveManagerSelectTag = document.getElementById("saveManagerIdSelectTag");
+		saveManagerIdSelectTag.selectedIndex = 0;
+		
+		let saveDepartmentsTag = document.getElementById("saveDepartmentsTag");
+		saveDepartmentsTag.selectedIndex = 0;
+		
+	}
+	
 	
 	$(function() { // 자바에서 main()함수의 기능 (현재 페이지의 태그가 로드되면 자동으로 호출되는 함수)
 		// 현재 페이지가 로딩되면 전체 사원목록을 얻어와 출력
@@ -587,7 +618,7 @@
 					</div>
 					<div class="mb-3 mt-3">
 						<label for="saveSalary" class="form-label">salary: <span
-							class="selectedSalary"></span></label>
+							class="selectedSalary" ></span></label>
 						<div class="rangeSalaryTag"></div>
 
 						<div class="minSalMaxSal">
